@@ -13,6 +13,13 @@ class Mission {
   final String shareResult;
   final String stopResult;
 
+  // 누락되었던 필드 추가
+  final String? reporterInfo;
+  final String? dateInfo;
+  final String? computerInfo;
+  final String? zoomInfo;
+
+
   Mission({
     required this.title,
     required this.content,
@@ -23,6 +30,11 @@ class Mission {
     required this.wrongFeedback,
     required this.shareResult,
     required this.stopResult,
+    // 생성자에도 추가
+    this.reporterInfo,
+    this.dateInfo,
+    this.computerInfo,
+    this.zoomInfo,
   });
 }
 

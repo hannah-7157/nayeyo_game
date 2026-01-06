@@ -7,12 +7,13 @@ class ReportScreen extends StatelessWidget {
   final int finalCoin;
   final int finalCredibility;
 
-  const ReportScreen(
-      {super.key,
-      required this.stats,
-      required this.finalXp,
-      required this.finalCoin,
-      required this.finalCredibility});
+  const ReportScreen({
+    super.key,
+    required this.stats,
+    required this.finalXp,
+    required this.finalCoin,
+    required this.finalCredibility,
+  });
 
   Map<String, dynamic> _analyzeMistakes() {
     final mistakes = stats.where((s) => !s.wasCorrect).toList();
@@ -23,11 +24,11 @@ class ReportScreen extends StatelessWidget {
       };
     }
 
-    int stage1Mistakes = mistakes.where((s) => s.missionIndex >= 1 && s.missionIndex <= 4).length;
+    int stage1Mistakes = mistakes.where((s) => s.missionIndex >= 0 && s.missionIndex <= 4).length;
     int stage2Mistakes = mistakes.where((s) => s.missionIndex >= 5 && s.missionIndex <= 8).length;
-    int stage3Mistakes = mistakes.where((s) => s.missionIndex >= 9 && s.missionIndex <= 12).length;
+    int stage3Mistakes = mistakes.where((s) => s.missionIndex >= 9).length;
 
-    if (stage3Mistakes > stage1Mistakes && stage3Mistakes > stage2Mistakes) {
+    if (stage3Mistakes >= stage1Mistakes && stage3Mistakes >= stage2Mistakes) {
       return {
         'pattern': '데이터/통계(3단계) 미션에서 실수가 잦았습니다.',
         'recommendations': [
@@ -36,7 +37,7 @@ class ReportScreen extends StatelessWidget {
           '통계의 기준(총량 vs 비율)을 명확히 구분하세요.'
         ]
       };
-    } else if (stage2Mistakes > stage1Mistakes) {
+    } else if (stage2Mistakes >= stage1Mistakes) {
       return {
         'pattern': 'SNS 루머(2단계) 판별에 어려움을 겪었습니다.',
         'recommendations': [
@@ -61,16 +62,25 @@ class ReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final correctCount = stats.where((s) => s.wasCorrect).length;
     final totalCount = stats.length;
-    final correctRate = totalCount > 0 ? (correctCount / totalCount * 100).toStringAsFixed(1) : 0;
+    final String correctRate = totalCount > 0 ? (correctCount / totalCount * 100).toStringAsFixed(1) : "0";
     final goodUboCount = stats.where((s) => s.wasCorrect && s.playerJudgment == Judgment.unsure).length;
     final analysis = _analyzeMistakes();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('종합 보고서')),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('종합 보고서'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+          )
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          Text('최종 결과', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text('최종 결과', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.black87)),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -82,12 +92,12 @@ class ReportScreen extends StatelessWidget {
           const SizedBox(height: 16),
           StatCard(title: '최종 신뢰도', value: '$finalCredibility', icon: Icons.shield, color: Colors.green),
           const Divider(height: 40),
-          Text('나의 판별 기록', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+          Text('나의 판별 기록', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.black87)),
           const SizedBox(height: 16),
           Card(child: ListTile(title: const Text('정답률'), trailing: Text('$correctRate%', style: Theme.of(context).textTheme.titleLarge))),
           Card(child: ListTile(title: const Text('"유보"를 잘한 횟수'), trailing: Text('$goodUboCount회', style: Theme.of(context).textTheme.titleLarge))),
           const Divider(height: 40),
-          Text('실수 패턴 분석', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+          Text('실수 패턴 분석', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.black87)),
           const SizedBox(height: 16),
           Card(
             child: Padding(
